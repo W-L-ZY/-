@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<style type="text/css">
+	/*小div的定位*/
+	#small{
+		position: relative;
+	}
+	/*两个div的尺寸是一样的*/
+	#small,#big{
+		width: 220px;
+		height: 220px;
+		float: left;
+		box-shadow: 0 0 5px gray;
+	}
+	/*正常图片和镜子里的图片尺寸是一样的*/
+	#small_pic,#small_pic2{
+		width: 220px;
+		height: 220px;
+		position: absolute;
+	}
+	/*镜子的大小，是div的倍数关系*/
+	#glass{
+		width: 110px;
+		height: 110px;
+		background: rgba(0,0,0,.5);
+		position: absolute;
+		top: 0;
+		display: none;
+		overflow: hidden;	/*溢出隐藏不可以漏掉*/
+	}
+	
+	#big{
+		margin-left: 10px;
+		overflow: hidden;	/*大图显示超出隐藏*/
+		position: relative;
+		display: none;
+	}
+	/*大图的尺寸,和原图是倍数关系*/
+	#big_pic{
+		width: 440px;
+		height: 440px;
+		position: absolute;
+		left: 0;
+	}
+	/*遮罩要完全盖住图片,所以和图片的大小要一样*/
+	#zhe{
+		width: 220px;
+		height: 220px;
+		background: rgba(0,0,0,.5);
+		position: absolute;
+		top: 0;
+		display: none;
+	}
+</style>
+</head>
+<body>
+
+<div id="box">
+<!--一个小盒子，包着图片和放大镜遮罩-->
+	<div id="small">
+		<img id="small_pic" src="images/img01.jpg" alt="" />
+		<!--遮罩-->
+		<div id="zhe"></div>
+		<!--放大镜-->
+		<div id="glass">
+			<img id="small_pic2" src="images/img01.jpg" alt="" />
+		</div>
+	</div>
+	<!--大盒子包着同样的图片，尺寸为小图片的倍数-->
+	<div id="big">
+		<img id="big_pic" src="images/img01.jpg"/>
+	</div>
+</div>
+
+<!--引入缓冲运动的js文件-->
+<script src="startMove.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	small.onmousemove = function(e){
+		var e = event || window.event;
+		var [x,y] = [e.clientX - small.offsetLeft,e.clientY - small.offsetTop];//解构赋值，定义鼠标刚进去时放大镜的位置
+		//让鼠标在遮罩的中心位置
+		x = x - glass.offsetWidth/2;
+		y = y - glass.offsetHeight/2;
+		//判断边界 宽度
+		var maxW = small.offsetWidth - glass.offsetWidth;	//最大宽度
+		
+		if ( x > maxW ) {
+			x = maxW;
+		}else if ( x < 0 ) {
+			x = 0;
+		}
+		//判断边界 高度
+		var maxH = small.offsetHeight - glass.offsetHeight;	//最大高度
+		if ( y > maxH ) {
+			y = maxH;
+		}else if ( y < 0 ) {
+			y = 0;
+		}
+		//更新放大镜的位置
+		glass.style.left = x + 'px';
+		glass.style.top = y + 'px';
+		//大图片的位置向左向上为负数，因为大小是二倍关系，所以要乘以2
+		big_pic.style.left = -2*x +'px';
+		big_pic.style.top = -2*y +'px';
+		
+		small_pic2.style.left = -x + 'px';
+		small_pic2.style.top = -y + 'px';
+	}
+	//鼠标放入，淡入，显示
+	small.onmouseover = ()=>{
+		glass.style.display = 'block';
+		glass.style.opacity = 0;	//在显示的时候透明度为0，也可以先透明度为0后显示
+		startMove(glass,{opacity:100});
+		
+		big.style.display = 'block';
+		big.style.opacity = 0;
+		startMove(big,{opacity:100});
+		
+		zhe.style.display = 'block';
+		zhe.style.opacity = 0;
+		startMove(zhe,{opacity:100});
+
+	}
+	//鼠标移除，淡出，显示隐藏
+	small.onmouseout = ()=>{
+		//鼠标移除时，先透明度为0，然后在执行隐藏	回调函数
+		
+		startMove(zhe,{opacity:0},()=>{	
+			zhe.style.display = 'none';
+		})
+
+		startMove(glass,{opacity:0},()=>{	
+			glass.style.display = 'none';
+		})
+		startMove(big,{opacity:0},()=>{
+			big.style.display = 'none';
+		})
+		
+	}
+	
+	
+</script>
+</body>
+</html>
