@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title></title>
+<style type="text/css">
+*{
+	padding: 0;
+	margin: 0;
+}
+div{
+	width: 810px;
+	height: 320px;
+	margin: auto;
+	position: relative;
+}
+ul{
+	list-style: none;
+	
+}
+ul li{
+	position: absolute;
+	width: 810px;
+	height: 320px;
+}
+ol{
+	list-style: none;
+	position: absolute;
+	right: 30px;
+	bottom: 10px;
+}
+ol li{
+	float: left;
+}
+ol li span{
+	width: 30px;
+	height: 30px;
+	border-radius: 50%;
+	display: block;
+	margin-left: 10px;
+	background: #fff;
+	box-shadow: 0 0 5px gray;
+	cursor: pointer;
+}
+</style>
+</head>
+<body>
+<div id="div1">
+	<ul id="ul1">
+		<li><a href="#1"><img src="images/001.jpg" alt="" /></a></li>
+		<li><a href="#2"><img src="images/002.jpg" alt="" /></a></li>
+		<li><a href="#3"><img src="images/003.jpg" alt="" /></a></li>
+		<li><a href="#4"><img src="images/004.jpg" alt="" /></a></li>
+	</ul>
+	<!--创建四个按钮-->
+	<ol>
+		<li><span></span></li>
+		<li><span></span></li>
+		<li><span></span></li>
+		<li><span></span></li>
+	</ol>
+</div>
+<!--引入js文件，做淡入淡出的效果-->
+<script src="../day-0416/startMove.js" type="text/javascript" charset="utf-8"></script>
+<script type="text/javascript">
+	var step = 3;	//定义一个全局变量，定义轮播图的下标
+	//找到四个按钮，因为queryselectorAll是元素集合，要通过下标获取，要先转成数组	Array.form();
+	var btns = Array.from(document.querySelectorAll('ol span'));
+	var len = btns.length;
+	console.log(btns);
+	//找到四张图片所在的li
+	var lis = Array.from(document.querySelectorAll('ul li'));
+	var lens = lis.length;
+	console.log(lis);
+	//对btns中的每个元素进行遍历，给每个按钮添加点击事件
+	btns.forEach((btn,index)=>{
+		
+		btn.onclick = ()=>{
+			
+			step = index;	//将下标index赋给step，在封装函数中可以被找到下标
+			console.log(btn,index);	//forEach是执行了四次函数，每个函数里都有一个局部变量btn，所以点击那个按钮，输出的就是哪个btn
+			
+			move();	//调用函数，让鼠标点击哪个按钮，切换到哪张图片
+		}
+	});
+	
+	//封装一个函数，
+	var move = ()=>{
+		lis.forEach((li,index)=>{//点击按钮时，对lis进行遍历，让每个li的透明度为0，同时让下标所对应的li的透明度为100；
+			
+			li.style.display = 'block';	//隐藏之前要让li先显示出来
+			//console.log(li,step);
+			
+			startMove(li,{'opacity':0},()=>{	//透明度为0，但是元素还在，∴对应网址没有改变，∴让每个li的透明度为0后，隐藏掉，显示后面的li
+				li.style.display = 'none';
+			});
+			btns[index].style.background = '';//让每个按钮的背景为空
+		})
+		btns[step].style.background = 'yellow';	//点击的时候，相对应下标的按钮背景会覆盖之前的背景，变颜色
+		startMove(lis[step],{'opacity':100});	//让lis中对应下标的li透明度为100
+		
+	}
+	move();	//默认开始的时候为哪张，按钮显示那个
+	
+	//自动轮播
+	var set = ()=>{
+		step++;
+//		判断step的大小,等于lis的长度时,让step从0开始;
+		if ( step == lens) {
+			step = 0;
+		}
+		move();
+	}
+	//启用定时器
+	var timer = setInterval(set,1000);
+	//鼠标移入停止播放
+	div1.onmouseover = ()=>{
+		clearInterval(timer);
+	}
+	//鼠标移除开启定时器
+	div1.onmouseout = ()=>{
+		timer = setInterval(set,1000);	
+	}
+</script>
+</body>
+</html>
